@@ -36,7 +36,7 @@ namespace QuizApp
                 new Question { Text = "Was ist ein Projektzielkonflikt?", Optionen = new List<string>{ "a) Unterschiedliche Erwartungen", "b) Ein technisches Problem", "c) Ein Zeitverzug" }, RichtigeAntwort = "a" },
                 new Question { Text = "Was ist ein Projektmeilensteinplan?", Optionen = new List<string>{ "a) Ein Budgetplan", "b) Plan mit wichtigen Terminen", "c) Ein Organigramm" }, RichtigeAntwort = "b" },
                 new Question { Text = "Was ist ein Projektkommunikationsplan?", Optionen = new List<string>{ "a) Plan für Meetings", "b) Plan für Informationsflüsse", "c) Ein Zeitplan" }, RichtigeAntwort = "b" }
-            }
+            };
 
             bool running = true;
             while (running)
@@ -45,7 +45,7 @@ namespace QuizApp
                 Console.WriteLine("1. Quiz starten");
                 Console.WriteLine("2. Beenden");
                 Console.Write("Bitte waehlen: ");
-                string auswahl = Console.ReadLine();
+                string auswahl = Console.ReadLine() ?? string.Empty;
 
                 if (auswahl == "1")
                 {
@@ -65,7 +65,7 @@ namespace QuizApp
                         while (true)
                         {
                             Console.Write("Antwort: ");
-                            antwort = Console.ReadLine();
+                            antwort = Console.ReadLine() ?? string.Empty;
                             if (!string.IsNullOrWhiteSpace(antwort)) break;
                             Console.WriteLine("Bitte geben Sie eine gueltige Antwort ein.");
                         }

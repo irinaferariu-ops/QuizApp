@@ -44,12 +44,12 @@ namespace QuizApp
                 Console.WriteLine("Willkommen bei QuizApp");
                 Console.WriteLine("1. Quiz starten");
                 Console.WriteLine("2. Beenden");
-                Console.Write("Bitte wählen: ");
+                Console.Write("Bitte waehlen: ");
                 string auswahl = Console.ReadLine();
 
                 if (auswahl == "1")
                 {
-                    Console.WriteLine("Drücken Sie Enter, um das Quiz zu starten...");
+                    Console.WriteLine("Druecken Sie Enter, um das Quiz zu starten...");
                     Console.ReadKey(true);
 
                     int punkte = 0;
@@ -67,7 +67,7 @@ namespace QuizApp
                             Console.Write("Antwort: ");
                             antwort = Console.ReadLine();
                             if (!string.IsNullOrWhiteSpace(antwort)) break;
-                            Console.WriteLine("Bitte geben Sie eine gültige Antwort ein.");
+                            Console.WriteLine("Bitte geben Sie eine gueltige Antwort ein.");
                         }
 
                         antwort = antwort.ToLower();
@@ -85,7 +85,7 @@ namespace QuizApp
                     }
 
                     Console.WriteLine($"Du hast {punkte} von {fragen.Count} Punkten erreicht.");
-                    Console.WriteLine("Drücke eine Taste zum Menü ");
+                    Console.WriteLine("Druecke eine Taste zum Menue ");
                     Console.ReadKey(true);
                 }
                 else if (auswahl == "2")
@@ -94,7 +94,7 @@ namespace QuizApp
                 }
                 else
                 {
-                    Console.WriteLine("Ungültige Eingabe. Bitte erneut versuchen.");
+                    Console.WriteLine("Ungueltige Eingabe. Bitte erneut versuchen.");
                     Console.ReadKey(true);
                 }
             }

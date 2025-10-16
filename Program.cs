@@ -5,9 +5,9 @@ namespace QuizApp
 {
     class Question
     {
-        public string Text { get; set; }
-        public List<string> Optionen { get; set; }
-        public string RichtigeAntwort { get; set; }
+        public string Text { get; set; } = string.Empty;
+        public List<string> Optionen { get; set; } = new List<string>();
+        public string RichtigeAntwort { get; set; } = string.Empty;
     }
 
     class Program

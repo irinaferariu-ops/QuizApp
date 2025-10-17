@@ -1,0 +1,19 @@
+# Build-Verzeichnisse
+bin/
+obj/
+
+# Benutzerdateien von Visual Studio Code
+.vscode/
+
+# Systemdateien
+*.user
+*.suo
+*.log
+*.vs
+
+# Dateien von Paketmanagern
+*.nupkg
+*.snupkg
+
+# Sonstiges
+*.DS_Store

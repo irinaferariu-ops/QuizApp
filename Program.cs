@@ -1,103 +1,204 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Text.Json;
+using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
 
 namespace QuizApp
 {
-    class Question
-    {
-        public string Text { get; set; } = string.Empty;
-        public List<string> Optionen { get; set; } = new List<string>();
-        public string RichtigeAntwort { get; set; } = string.Empty;
-    }
-
     class Program
     {
         static void Main(string[] args)
         {
-            List<Question> fragen = new List<Question>
-            {
-                new Question { Text = "Was ist ein Projekt?", Optionen = new List<string>{ "a) Eine dauerhafte Aufgabe", "b) Eine einmalige Aufgabe mit Ziel", "c) Eine Routinearbeit" }, RichtigeAntwort = "b" },
-                new Question { Text = "Was bedeutet SMART bei Zieldefinitionen?", Optionen = new List<string>{ "a) Spezifisch, Messbar, Attraktiv, Realistisch, Terminiert", "b) Schnell, Machbar, Aktiv, Real, Testbar", "c) Sicher, Modern, Aktiv, Realistisch, Terminiert" }, RichtigeAntwort = "a" },
-                new Question { Text = "Was ist ein Meilenstein?", Optionen = new List<string>{ "a) Ein Projektrisiko", "b) Ein wichtiger Projektzeitpunkt", "c) Ein Budgetposten" }, RichtigeAntwort = "b" },
-                new Question { Text = "Was ist ein Projektstrukturplan?", Optionen = new List<string>{ "a) Ein Zeitplan", "b) Eine Aufgabenübersicht", "c) Ein Budgetplan" }, RichtigeAntwort = "b" },
-                new Question { Text = "Was ist ein Gantt-Diagramm?", Optionen = new List<string>{ "a) Ein Balkendiagramm zur Zeitplanung", "b) Ein Kreisdiagramm", "c) Ein Organigramm" }, RichtigeAntwort = "a" },
-                new Question { Text = "Was ist ein Stakeholder?", Optionen = new List<string>{ "a) Ein Projektleiter", "b) Eine interessierte Person/Gruppe", "c) Ein Sponsor" }, RichtigeAntwort = "b" },
-                new Question { Text = "Was ist ein Risiko im Projekt?", Optionen = new List<string>{ "a) Eine Chance", "b) Eine Unsicherheit mit negativer Auswirkung", "c) Ein Ziel" }, RichtigeAntwort = "b" },
-                new Question { Text = "Was ist ein Projektauftrag?", Optionen = new List<string>{ "a) Eine Rechnung", "b) Eine Zielvereinbarung", "c) Eine formale Beauftragung" }, RichtigeAntwort = "c" },
-                new Question { Text = "Was ist ein Projektziel?", Optionen = new List<string>{ "a) Ein Wunsch", "b) Ein klar definiertes Ergebnis", "c) Eine Idee" }, RichtigeAntwort = "b" },
-                new Question { Text = "Was ist ein Projektleiter?", Optionen = new List<string>{ "a) Ein Teammitglied", "b) Eine Führungskraft", "c) Verantwortlich für Planung und Steuerung" }, RichtigeAntwort = "c" },
-                new Question { Text = "Was ist ein Projektteam?", Optionen = new List<string>{ "a) Eine Abteilung", "b) Eine Gruppe von Projektbeteiligten", "c) Die Geschäftsführung" }, RichtigeAntwort = "b" },
-                new Question { Text = "Was ist ein Projektstart-Workshop?", Optionen = new List<string>{ "a) Ein Schulungstag", "b) Ein Kick-off zur Abstimmung", "c) Ein Abschlussgespräch" }, RichtigeAntwort = "b" },
-                new Question { Text = "Was ist ein Projektabschlussbericht?", Optionen = new List<string>{ "a) Ein Budgetplan", "b) Eine Zusammenfassung der Ergebnisse", "c) Ein Zeitplan" }, RichtigeAntwort = "b" },
-                new Question { Text = "Was ist Projektcontrolling?", Optionen = new List<string>{ "a) Kontrolle der Mitarbeiter", "b) Überwachung von Zeit, Kosten, Qualität", "c) Eine Abschlussprüfung" }, RichtigeAntwort = "b" },
-                new Question { Text = "Was ist ein Projektbudget?", Optionen = new List<string>{ "a) Anzahl der Mitarbeiter", "b) Geplante Kosten", "c) Die Dauer" }, RichtigeAntwort = "b" },
-                new Question { Text = "Was ist ein Projektstatusbericht?", Optionen = new List<string>{ "a) Bericht über Projektfortschritt", "b) Ein Abschlussbericht", "c) Ein Zeitplan" }, RichtigeAntwort = "a" },
-                new Question { Text = "Was ist ein Projektlebenszyklus?", Optionen = new List<string>{ "a) Dauer eines Meetings", "b) Phasen eines Projekts", "c) Lebensdauer eines Produkts" }, RichtigeAntwort = "b" },
-                new Question { Text = "Was ist ein Projektzielkonflikt?", Optionen = new List<string>{ "a) Unterschiedliche Erwartungen", "b) Ein technisches Problem", "c) Ein Zeitverzug" }, RichtigeAntwort = "a" },
-                new Question { Text = "Was ist ein Projektmeilensteinplan?", Optionen = new List<string>{ "a) Ein Budgetplan", "b) Plan mit wichtigen Terminen", "c) Ein Organigramm" }, RichtigeAntwort = "b" },
-                new Question { Text = "Was ist ein Projektkommunikationsplan?", Optionen = new List<string>{ "a) Plan für Meetings", "b) Plan für Informationsflüsse", "c) Ein Zeitplan" }, RichtigeAntwort = "b" }
-            };
+            Console.OutputEncoding = Encoding.UTF8;
 
-            bool running = true;
-            while (running)
-            {
-                Console.WriteLine("Willkommen bei QuizApp");
-                Console.WriteLine("1. Quiz starten");
-                Console.WriteLine("2. Beenden");
-                Console.Write("Bitte waehlen: ");
-                string auswahl = Console.ReadLine() ?? string.Empty;
+            User user = new User();
+            ZeigeMenü(user);
 
-                if (auswahl == "1")
+            List<Question> fragen = LadeFragen("questions.json");
+
+            Console.Clear();
+            Console.WriteLine("==== Prüfung Start ====");
+            Console.WriteLine($"Name: {user.Name}");
+            Console.WriteLine($"Stadt: {user.Stadt}");
+            Console.WriteLine($"Datum: {user.Datum}");
+            Console.WriteLine($"Niveau: {user.Niveau}");
+            Console.WriteLine("\nDrücke eine Taste, um zu beginnen...");
+            Console.ReadKey();
+
+            foreach (var frage in fragen)
+            {
+                Console.Clear();
+                Console.WriteLine($"Frage: {frage.Text}\n");
+
+                if (frage.Typ == "MultipleChoice")
                 {
-                    Console.WriteLine("Druecken Sie Enter, um das Quiz zu starten...");
-                    Console.ReadKey(true);
-
-                    int punkte = 0;
-                    foreach (var frage in fragen)
+                    for (int i = 0; i < frage.Optionen.Count; i++)
                     {
-                        Console.WriteLine("" + frage.Text);
-                        foreach (var option in frage.Optionen)
-                        {
-                            Console.WriteLine(option);
-                        }
-
-                        string antwort = "";
-                        while (true)
-                        {
-                            Console.Write("Antwort: ");
-                            antwort = Console.ReadLine() ?? string.Empty;
-                            if (!string.IsNullOrWhiteSpace(antwort)) break;
-                            Console.WriteLine("Bitte geben Sie eine gueltige Antwort ein.");
-                        }
-
-                        antwort = antwort.ToLower();
-                        if (antwort == frage.RichtigeAntwort)
-                        {
-                            Console.WriteLine("Richtig!");
-                            punkte++;
-                        }
-                        else
-                        {
-                            Console.WriteLine($"Falsch. Die richtige Antwort ist: {frage.RichtigeAntwort}");
-                        }
-                        Console.WriteLine("Weiter mit Enter...");
-                        Console.ReadKey(true);
+                        Console.WriteLine($"{i + 1}. {frage.Optionen[i]}");
                     }
 
-                    Console.WriteLine($"Du hast {punkte} von {fragen.Count} Punkten erreicht.");
-                    Console.WriteLine("Druecke eine Taste zum Menue ");
-                    Console.ReadKey(true);
+                    Console.Write("\nDeine Antwort (Nummern mit Komma trennen, z.B. 1,3): ");
+                    string input = Console.ReadLine() ?? "";
+
+                    var eingaben = input
+                        .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                        .Select(i => i.Trim())
+                        .ToList();
+
+                    List<string> gegebeneAntworten = new List<string>();
+
+                    foreach (var eingabe in eingaben)
+                    {
+                        if (int.TryParse(eingabe, out int nummer) &&
+                            nummer >= 1 &&
+                            nummer <= frage.Optionen.Count)
+                        {
+                            gegebeneAntworten.Add(frage.Optionen[nummer - 1]);
+                        }
+                    }
+
+                    if (Enumerable.SequenceEqual(
+                            gegebeneAntworten.OrderBy(x => x),
+                            frage.RichtigeAntworten.OrderBy(x => x)))
+                    {
+                        Console.WriteLine("✅ Richtig!");
+                        user.Punktestand++;
+                    }
+                    else
+                    {
+                        Console.WriteLine("❌ Falsch!");
+                        Console.WriteLine($"Richtige Antwort(en): {string.Join(", ", frage.RichtigeAntworten)}");
+                    }
                 }
-                else if (auswahl == "2")
+                else if (frage.Typ == "OffeneFrage")
                 {
-                    running = false;
+                    Console.Write("Deine Antwort: ");
+                    string antwort = Console.ReadLine() ?? "";
+
+                    if (string.IsNullOrWhiteSpace(antwort))
+                    {
+                        Console.WriteLine("⚠️ Du hast keine Antwort eingegeben.");
+                    }
+                    else if (AntwortIstAehnlich(antwort, frage.RichtigeAntworten))
+                    {
+                        Console.WriteLine("✅ Richtig (inhaltlich erkannt)");
+                        user.Punktestand++;
+                    }
+                    else
+                    {
+                        Console.WriteLine("❌ Nicht korrekt erkannt.");
+                        if (frage.RichtigeAntworten.Count > 0)
+                            Console.WriteLine($"Mögliche Antwort: {frage.RichtigeAntworten[0]}");
+                    }
                 }
-                else
+                Console.WriteLine("\nDrücke eine Taste für die nächste Frage...");
+                Console.ReadKey();
+            }
+            Console.Clear();
+            Console.WriteLine("🎉 Prüfung abgeschlossen!");
+            Console.WriteLine($"Punktestand: {user.Punktestand} / {fragen.Count}");
+            Console.WriteLine("Vielen Dank und viel Erfolg weiterhin!");
+        }
+        static void ZeigeMenü(User user)
+        {
+            Console.Clear();
+            Console.WriteLine("==== Projektmanagement Prüfung ====\n");
+
+            Console.Write("Gib deinen Namen ein: ");
+            string? nameInput = Console.ReadLine();
+            user.Name = nameInput ?? "";
+
+            Console.Write("Stadt der Prüfung: ");
+            string? stadtInput = Console.ReadLine();
+            user.Stadt = stadtInput ?? "";
+
+            Console.Write("Datum (z.B. 17.10.2025): ");
+            string? datumInput = Console.ReadLine();
+            user.Datum = datumInput ?? "";
+
+            Console.WriteLine("Wähle das Prüfungsniveau:");
+            Console.WriteLine("1. Basiszertifizierung");
+            Console.WriteLine("2. Niveau D");
+            Console.WriteLine("3. Niveau C");
+            Console.Write("Deine Wahl (1-3): ");
+            string? auswahl = Console.ReadLine();
+
+            switch (auswahl)
+            {
+                case "1":
+                    user.Niveau = "Basiszertifizierung";
+                    break;
+                case "2":
+                    user.Niveau = "Niveau D";
+                    break;
+                case "3":
+                    user.Niveau = "Niveau C";
+                    break;
+                default:
+                    user.Niveau = "Unbekannt";
+                    break;
+            }
+        }
+
+        static List<Question> LadeFragen(string dateiPfad)
+        {
+            if (!File.Exists(dateiPfad))
+            {
+                Console.WriteLine("❌ Fehler: questions.json nicht gefunden.");
+                return new List<Question>();
+            }
+
+            string json = File.ReadAllText(dateiPfad);
+            var fragen = JsonSerializer.Deserialize<List<Question>>(json);
+            return fragen ?? new List<Question>();
+        }
+
+        static bool AntwortIstAehnlich(string benutzerAntwort, List<string> richtigeAntworten, double toleranz = 0.6)
+        {
+            if (string.IsNullOrWhiteSpace(benutzerAntwort)) return false;
+
+            benutzerAntwort = Regex.Replace(benutzerAntwort.ToLower(), @"[^\w\s]", "");
+
+            foreach (var richtige in richtigeAntworten)
+            {
+                string richtigeClean = Regex.Replace(richtige.ToLower(), @"[^\w\s]", "");
+                double score = BerechneAehnlichkeit(benutzerAntwort, richtigeClean);
+                if (score >= toleranz)
+                    return true;
+            }
+
+            return false;
+        }
+
+        static double BerechneAehnlichkeit(string s1, string s2)
+        {
+            if (string.IsNullOrEmpty(s1) || string.IsNullOrEmpty(s2)) return 0.0;
+
+            int len1 = s1.Length;
+            int len2 = s2.Length;
+            int[,] matrix = new int[len1 + 1, len2 + 1];
+
+            for (int i = 0; i <= len1; i++) matrix[i, 0] = i;
+            for (int j = 0; j <= len2; j++) matrix[0, j] = j;
+
+            for (int i = 1; i <= len1; i++)
+            {
+                for (int j = 1; j <= len2; j++)
                 {
-                    Console.WriteLine("Ungueltige Eingabe. Bitte erneut versuchen.");
-                    Console.ReadKey(true);
+                    int cost = (s1[i - 1] == s2[j - 1]) ? 0 : 1;
+                    matrix[i, j] = Math.Min(
+                        Math.Min(matrix[i - 1, j] + 1, matrix[i, j - 1] + 1),
+                        matrix[i - 1, j - 1] + cost
+                    );
                 }
             }
+
+            int maxLen = Math.Max(len1, len2);
+            return 1.0 - (double)matrix[len1, len2] / maxLen;
         }
     }
 }
+

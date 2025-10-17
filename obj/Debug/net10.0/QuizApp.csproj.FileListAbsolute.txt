@@ -12,3 +12,5 @@ C:\Users\FerariuIrina\OneDrive - LG-Academy\Desktop\QuizApp\obj\Debug\net10.0\re
 C:\Users\FerariuIrina\OneDrive - LG-Academy\Desktop\QuizApp\obj\Debug\net10.0\QuizApp.pdb
 C:\Users\FerariuIrina\OneDrive - LG-Academy\Desktop\QuizApp\obj\Debug\net10.0\QuizApp.genruntimeconfig.cache
 C:\Users\FerariuIrina\OneDrive - LG-Academy\Desktop\QuizApp\obj\Debug\net10.0\ref\QuizApp.dll
+C:\Users\FerariuIrina\OneDrive - LG-Academy\Desktop\QuizApp\bin\Debug\net10.0\questions.json
+C:\Users\FerariuIrina\OneDrive - LG-Academy\Desktop\QuizApp\obj\Debug\net10.0\QuizApp.sourcelink.json

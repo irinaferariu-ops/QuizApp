@@ -1,0 +1,92 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\FerariuIrina\\OneDrive - LG-Academy\\Desktop\\QuizApp\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{EFA6DB9E-999B-B841-524B-D20E8FBADBAC}|QuizApp.csproj|c:\\users\\ferariuirina\\onedrive - lg-academy\\desktop\\quizapp\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{EFA6DB9E-999B-B841-524B-D20E8FBADBAC}|QuizApp.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EFA6DB9E-999B-B841-524B-D20E8FBADBAC}|QuizApp.csproj|c:\\users\\ferariuirina\\onedrive - lg-academy\\desktop\\quizapp\\question.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{EFA6DB9E-999B-B841-524B-D20E8FBADBAC}|QuizApp.csproj|solutionrelative:question.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EFA6DB9E-999B-B841-524B-D20E8FBADBAC}|QuizApp.csproj|c:\\users\\ferariuirina\\onedrive - lg-academy\\desktop\\quizapp\\user.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{EFA6DB9E-999B-B841-524B-D20E8FBADBAC}|QuizApp.csproj|solutionrelative:user.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EFA6DB9E-999B-B841-524B-D20E8FBADBAC}|QuizApp.csproj|c:\\users\\ferariuirina\\onedrive - lg-academy\\desktop\\quizapp\\questions.json||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{EFA6DB9E-999B-B841-524B-D20E8FBADBAC}|QuizApp.csproj|solutionrelative:questions.json||{8B382828-6202-11D1-8870-0000F87579D2}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 4,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{cce594b6-0c39-4442-ba28-10c64ac7e89f}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "questions.json",
+              "DocumentMoniker": "C:\\Users\\FerariuIrina\\OneDrive - LG-Academy\\Desktop\\QuizApp\\questions.json",
+              "RelativeDocumentMoniker": "questions.json",
+              "ToolTip": "C:\\Users\\FerariuIrina\\OneDrive - LG-Academy\\Desktop\\QuizApp\\questions.json",
+              "RelativeToolTip": "questions.json",
+              "ViewState": "AgIAALIAAAAAAAAAAAAIwEYBAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-10-17T08:41:15.977Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "User.cs",
+              "DocumentMoniker": "C:\\Users\\FerariuIrina\\OneDrive - LG-Academy\\Desktop\\QuizApp\\User.cs",
+              "RelativeDocumentMoniker": "User.cs",
+              "ToolTip": "C:\\Users\\FerariuIrina\\OneDrive - LG-Academy\\Desktop\\QuizApp\\User.cs",
+              "RelativeToolTip": "User.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-17T07:14:12.612Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Question.cs",
+              "DocumentMoniker": "C:\\Users\\FerariuIrina\\OneDrive - LG-Academy\\Desktop\\QuizApp\\Question.cs",
+              "RelativeDocumentMoniker": "Question.cs",
+              "ToolTip": "C:\\Users\\FerariuIrina\\OneDrive - LG-Academy\\Desktop\\QuizApp\\Question.cs",
+              "RelativeToolTip": "Question.cs",
+              "ViewState": "AgIAAAgAAAAAAAAAAABFwBAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-17T07:13:45.277Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\FerariuIrina\\OneDrive - LG-Academy\\Desktop\\QuizApp\\Program.cs",
+              "RelativeDocumentMoniker": "Program.cs",
+              "ToolTip": "C:\\Users\\FerariuIrina\\OneDrive - LG-Academy\\Desktop\\QuizApp\\Program.cs",
+              "RelativeToolTip": "Program.cs",
+              "ViewState": "AgIAAE4AAAAAAAAAAAAYwGcAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-17T07:05:02.896Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+[
+  {
+    "Id": 1,
+    "Typ": "MultipleChoice",
+    "FrageText": "Was sind die Phasen des Projektmanagements?",
+    "Antworten": [
+      "Initialisierung",
+      "Planung",
+      "Ausführung",
+      "Abschluss",
+      "Marketing"
+    ],
+    "RichtigeAntworten": [0, 1, 2, 3],
+    "RichtigeAntwort": ""
+  },
+  {
+    "Id": 2,
+    "Typ": "Offen",
+    "FrageText": "Was ist ein Projektstrukturplan?",
+    "Antworten": [],
+    "RichtigeAntworten": [],
+    "RichtigeAntwort": "Ein Projektstrukturplan ist eine hierarchische Darstellung aller Arbeitspakete eines Projekts"
+  },
+  {
+    "Id": 3,
+    "Typ": "MultipleChoice",
+    "FrageText": "Welche Methode gehört zum agilen Projektmanagement?",
+    "Antworten": [
+      "Scrum",
+      "Kanban",
+      "Wasserfall",
+      "Prince2"
+    ],
+    "RichtigeAntworten": [0, 1],
+    "RichtigeAntwort": ""
+  }
+]

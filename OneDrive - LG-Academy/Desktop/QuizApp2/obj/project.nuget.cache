@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "3mUh7JIaeFQ=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\FerariuIrina\\OneDrive - LG-Academy\\Desktop\\QuizApp2\\TestRunner.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\FerariuIrina\\.nuget\\packages\\newtonsoft.json\\13.0.3\\newtonsoft.json.13.0.3.nupkg.sha512"
+  ],
+  "logs": []
+}

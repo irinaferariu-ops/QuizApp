@@ -1,4 +1,4 @@
-# Build-Verzeichnisse
+:   # Build-Verzeichnisse
 bin/
 obj/
 
@@ -17,3 +17,7 @@ obj/
 
 # Sonstiges
 *.DS_Store
+
+
+
+

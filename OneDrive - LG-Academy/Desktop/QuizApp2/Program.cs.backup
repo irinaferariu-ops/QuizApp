@@ -1,0 +1,641 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading;
+using Newtonsoft.Json;
+
+namespace QuizApp2
+{
+    public class Program
+    {
+        // Speichere Scores im Benutzer-AppData-Ordner
+        static string ScoresFile
+        {
+            get
+            {
+                var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+                var dir = Path.Combine(appData, "QuizApp2");
+                if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
+                return Path.Combine(dir, "scores.json");
+            }
+        }
+
+        static void Main(string[] args)
+        {
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
+            ZeigeHeader();
+            var scores = LadeScores();
+
+            while (true)
+            {
+                ZeigeHauptmenue();
+                var auswahl = Console.ReadLine()?.Trim() ?? string.Empty;
+
+                if (auswahl == "1")
+                {
+                    // Quiz mit Pomodoro (Lernmodus)
+                    var benutzer = SammleBenutzerDaten();
+                    StarteQuizMitPomodoro(benutzer);
+                    scores.Add(benutzer);
+                    SpeichereScores(scores);
+                    Console.WriteLine("\n✅ Ergebnis gespeichert!");
+                    PauseUndLoesche();
+                }
+                else if (auswahl == "2")
+                {
+                    // Quiz Examen (1,5 Stunden)
+                    var benutzer = SammleBenutzerDaten();
+                    StarteExamenQuiz(benutzer);
+                    scores.Add(benutzer);
+                    SpeichereScores(scores);
+                    Console.WriteLine("\n✅ Ergebnis gespeichert!");
+                    PauseUndLoesche();
+                }
+                else if (auswahl == "3")
+                {
+                    ZeigeHighscores(scores);
+                    PauseUndLoesche();
+                }
+                else if (auswahl == "4")
+                {
+                    Console.WriteLine("\n👋 Auf Wiedersehen! Viel Erfolg bei deiner Prüfung!");
+                    break;
+                }
+                else
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("❌ Ungültige Auswahl! Bitte wähle 1-4.");
+                    Console.ResetColor();
+                }
+            }
+        }
+
+        static void ZeigeHeader()
+        {
+            Console.Clear();
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine("╔═══════════════════════════════════════════╗");
+            Console.WriteLine("║   🎓 QuizApp - Prüfungssimulation 🎓     ║");
+            Console.WriteLine("║     Projektmanagement - Lernmodus         ║");
+            Console.WriteLine("╚═══════════════════════════════════════════╝");
+            Console.ResetColor();
+        }
+
+        static void ZeigeHauptmenue()
+        {
+            Console.WriteLine("\n📋 Hauptmenü:");
+            Console.WriteLine("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+            Console.WriteLine("1️⃣  📚 Quiz mit Pomodoro (Lernmodus mit Pausen)");
+            Console.WriteLine("2️⃣  📝 Quiz Examen (1,5 Std - Prüfungssimulation)");
+            Console.WriteLine("3️⃣  � Highscores anzeigen");
+            Console.WriteLine("4️⃣  🚪 Beenden");
+            Console.WriteLine("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+            Console.Write("➡️  Deine Auswahl: ");
+        }
+
+        static Benutzer SammleBenutzerDaten()
+        {
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.Write("\n👤 Bitte gib deinen Namen ein: ");
+            Console.ResetColor();
+            string name = Console.ReadLine() ?? string.Empty;
+
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.Write("🏙️  Stadt: ");
+            Console.ResetColor();
+            string stadt = Console.ReadLine() ?? string.Empty;
+
+            string datum = DateTime.Now.ToString("dd.MM.yyyy");
+
+            Console.WriteLine("\n📘 Welches Niveau möchtest du prüfen?");
+            Console.WriteLine("   1️⃣  Basiszertifizierung");
+            Console.WriteLine("   2️⃣  Level D");
+            Console.WriteLine("   3️⃣  Level C");
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.Write("➡️  Deine Auswahl (1-3): ");
+            Console.ResetColor();
+            string niveau = Console.ReadLine() ?? string.Empty;
+
+            return new Benutzer(name, stadt, datum, niveau);
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        // 📚 QUIZ MIT POMODORO: Lernen mit Pausen alle 25 Minuten
+        // ═══════════════════════════════════════════════════════════
+        
+        static void StarteQuizMitPomodoro(Benutzer benutzer)
+        {
+            try
+            {
+                string basePath = AppDomain.CurrentDomain.BaseDirectory;
+                string pfad = Path.Combine(basePath, "question.json");
+                
+                Console.WriteLine($"\n🔎 Lade Fragen aus: {pfad}");
+                List<Frage> fragen = JsonConvert.DeserializeObject<List<Frage>>(File.ReadAllText(pfad)) ?? new List<Frage>();
+                
+                double punktzahl = 0.0;
+                int frageNummer = 1;
+                DateTime startZeit = DateTime.Now;
+                DateTime naechstePause = startZeit.AddMinutes(25);
+
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("\n🍅 ═══════════════════════════════════════");
+                Console.WriteLine("   POMODORO-LERNMODUS AKTIVIERT!");
+                Console.WriteLine("   Alle 25 Minuten: 5 Min Pause");
+                Console.WriteLine("═══════════════════════════════════════");
+                Console.ResetColor();
+
+                foreach (var frage in fragen)
+                {
+                    // Prüfe, ob Pausenzeit erreicht ist
+                    if (DateTime.Now >= naechstePause)
+                    {
+                        SpieleSignalTon();
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        Console.WriteLine("\n\n☕ ════════════════════════════════════");
+                        Console.WriteLine("   ⏰ PAUSENZEIT! 5 Minuten Pause");
+                        Console.WriteLine("   💆 Steh auf, trink Wasser, entspanne dich!");
+                        Console.WriteLine("════════════════════════════════════");
+                        Console.ResetColor();
+                        
+                        if (!LasseTimerLaufen(5 * 60, "PAUSE"))
+                            return;
+                        
+                        SpieleSignalTon();
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        Console.WriteLine("\n✅ Pause beendet! Weiter geht's mit dem Lernen!");
+                        Console.ResetColor();
+                        
+                        naechstePause = DateTime.Now.AddMinutes(25);
+                    }
+
+                    // Zeige Frage
+                    Console.WriteLine($"\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine($"📝 Frage {frageNummer}/{fragen.Count}:");
+                    Console.ResetColor();
+                    Console.WriteLine(frage.FrageText);
+
+                    if (frage.Typ == "MultipleChoice")
+                    {
+                        for (int i = 0; i < frage.Antworten.Count; i++)
+                        {
+                            Console.WriteLine($"   {i + 1}) {frage.Antworten[i]}");
+                        }
+                        
+                        Console.Write("\n➡️  Deine Antwort (z.B. 1 oder 1,2): ");
+                        var eingabe = Console.ReadLine() ?? string.Empty;
+
+                        var antworten = eingabe.Split(',', StringSplitOptions.RemoveEmptyEntries)
+                            .Select(s => int.TryParse(s.Trim(), out int val) ? val - 1 : -1)
+                            .Where(i => i >= 0)
+                            .ToList();
+
+                        if (PruefeMultipleChoice(frage, antworten))
+                        {
+                            Console.ForegroundColor = ConsoleColor.Green;
+                            Console.WriteLine("✅ Richtig!");
+                            Console.ResetColor();
+                            punktzahl++;
+                        }
+                        else
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine("❌ Falsch!");
+                            Console.ResetColor();
+                            Console.WriteLine("✔️  Richtige Antwort(en): " + 
+                                string.Join(", ", frage.RichtigeAntworten.Select(i => (i + 1).ToString())));
+                        }
+                    }
+                    else if (frage.Typ == "Offen")
+                    {
+                        Console.Write("\n✏️  Deine Antwort: ");
+                        var userAntwort = Console.ReadLine() ?? string.Empty;
+                        double score = PruefeOffeneFrage(userAntwort, frage.RichtigeAntwort);
+
+                        if (score >= 0.8)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Green;
+                            Console.WriteLine("✅ Vollständig korrekt!");
+                            Console.ResetColor();
+                            punktzahl++;
+                        }
+                        else if (score >= 0.5)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Yellow;
+                            Console.WriteLine("🟡 Teilweise korrekt (0.5 Punkte).");
+                            Console.ResetColor();
+                            punktzahl += 0.5;
+                        }
+                        else
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine("❌ Leider falsch.");
+                            Console.ResetColor();
+                            Console.WriteLine("💡 Erwartete Schlüsselbegriffe: " + frage.RichtigeAntwort);
+                        }
+                    }
+
+                    frageNummer++;
+                }
+
+                benutzer.Punktestand = punktzahl;
+                TimeSpan gesamtZeit = DateTime.Now - startZeit;
+                
+                Console.WriteLine("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.WriteLine($"🏁 Quiz beendet! {benutzer.Name}, du hast {punktzahl:0.0} von {fragen.Count} Punkten erreicht.");
+                Console.WriteLine($"⏱️  Gesamtzeit: {gesamtZeit.Hours}h {gesamtZeit.Minutes}min");
+                Console.ResetColor();
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"❌ Fehler beim Laden der Fragen: {ex.Message}");
+                Console.ResetColor();
+            }
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        // 📝 EXAMEN-QUIZ: 1,5 Stunden Prüfungssimulation
+        // ═══════════════════════════════════════════════════════════
+        
+        static void StarteExamenQuiz(Benutzer benutzer)
+        {
+            try
+            {
+                string basePath = AppDomain.CurrentDomain.BaseDirectory;
+                string pfad = Path.Combine(basePath, "question.json");
+                
+                Console.WriteLine($"\n🔎 Lade Fragen aus: {pfad}");
+                List<Frage> fragen = JsonConvert.DeserializeObject<List<Frage>>(File.ReadAllText(pfad)) ?? new List<Frage>();
+                
+                double punktzahl = 0.0;
+                int frageNummer = 1;
+                DateTime startZeit = DateTime.Now;
+                DateTime endZeit = startZeit.AddMinutes(90); // 1,5 Stunden
+
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("\n📝 ═══════════════════════════════════════");
+                Console.WriteLine("   PRÜFUNGSSIMULATION GESTARTET!");
+                Console.WriteLine("   Zeitlimit: 1,5 Stunden (90 Minuten)");
+                Console.WriteLine("   Keine Pausen - wie bei echtem Examen");
+                Console.WriteLine("═══════════════════════════════════════");
+                Console.ResetColor();
+                Console.WriteLine("\n⏰ Drücke Enter um zu starten...");
+                Console.ReadLine();
+
+                foreach (var frage in fragen)
+                {
+                    // Prüfe verbleibende Zeit
+                    TimeSpan verbleibend = endZeit - DateTime.Now;
+                    
+                    if (verbleibend.TotalSeconds <= 0)
+                    {
+                        SpieleSignalTon();
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("\n\n⏰ ════════════════════════════════════");
+                        Console.WriteLine("   ZEIT ABGELAUFEN!");
+                        Console.WriteLine("   Das Examen ist beendet.");
+                        Console.WriteLine("════════════════════════════════════");
+                        Console.ResetColor();
+                        break;
+                    }
+
+                    // Zeige Frage mit Zeitanzeige
+                    Console.WriteLine($"\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine($"📝 Frage {frageNummer}/{fragen.Count} | ⏱️  Verbleibend: {verbleibend.Hours}h {verbleibend.Minutes}min {verbleibend.Seconds}s");
+                    Console.ResetColor();
+                    Console.WriteLine(frage.FrageText);
+
+                    if (frage.Typ == "MultipleChoice")
+                    {
+                        for (int i = 0; i < frage.Antworten.Count; i++)
+                        {
+                            Console.WriteLine($"   {i + 1}) {frage.Antworten[i]}");
+                        }
+                        
+                        Console.Write("\n➡️  Deine Antwort (z.B. 1 oder 1,2): ");
+                        var eingabe = Console.ReadLine() ?? string.Empty;
+
+                        var antworten = eingabe.Split(',', StringSplitOptions.RemoveEmptyEntries)
+                            .Select(s => int.TryParse(s.Trim(), out int val) ? val - 1 : -1)
+                            .Where(i => i >= 0)
+                            .ToList();
+
+                        if (PruefeMultipleChoice(frage, antworten))
+                        {
+                            Console.ForegroundColor = ConsoleColor.Green;
+                            Console.WriteLine("✅ Richtig!");
+                            Console.ResetColor();
+                            punktzahl++;
+                        }
+                        else
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine("❌ Falsch!");
+                            Console.ResetColor();
+                            Console.WriteLine("✔️  Richtige Antwort(en): " + 
+                                string.Join(", ", frage.RichtigeAntworten.Select(i => (i + 1).ToString())));
+                        }
+                    }
+                    else if (frage.Typ == "Offen")
+                    {
+                        Console.Write("\n✏️  Deine Antwort: ");
+                        var userAntwort = Console.ReadLine() ?? string.Empty;
+                        double score = PruefeOffeneFrage(userAntwort, frage.RichtigeAntwort);
+
+                        if (score >= 0.8)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Green;
+                            Console.WriteLine("✅ Vollständig korrekt!");
+                            Console.ResetColor();
+                            punktzahl++;
+                        }
+                        else if (score >= 0.5)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Yellow;
+                            Console.WriteLine("🟡 Teilweise korrekt (0.5 Punkte).");
+                            Console.ResetColor();
+                            punktzahl += 0.5;
+                        }
+                        else
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine("❌ Leider falsch.");
+                            Console.ResetColor();
+                            Console.WriteLine("💡 Erwartete Schlüsselbegriffe: " + frage.RichtigeAntwort);
+                        }
+                    }
+
+                    frageNummer++;
+                }
+
+                benutzer.Punktestand = punktzahl;
+                TimeSpan gesamtZeit = DateTime.Now - startZeit;
+                
+                SpieleSignalTon();
+                Console.WriteLine("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.WriteLine($"🏁 Examen beendet! {benutzer.Name}, du hast {punktzahl:0.0} von {fragen.Count} Punkten erreicht.");
+                Console.WriteLine($"⏱️  Benötigte Zeit: {gesamtZeit.Hours}h {gesamtZeit.Minutes}min {gesamtZeit.Seconds}s");
+                Console.ResetColor();
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"❌ Fehler beim Laden der Fragen: {ex.Message}");
+                Console.ResetColor();
+            }
+        }
+        {
+            try
+            {
+                string basePath = AppDomain.CurrentDomain.BaseDirectory;
+                string pfad = Path.Combine(basePath, "question.json");
+                
+                Console.WriteLine($"\n🔎 Lade Fragen aus: {pfad}");
+                List<Frage> fragen = JsonConvert.DeserializeObject<List<Frage>>(File.ReadAllText(pfad)) ?? new List<Frage>();
+                
+                double punktzahl = 0.0;
+                int frageNummer = 1;
+
+                foreach (var frage in fragen)
+                {
+                    Console.WriteLine($"\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine($"📝 Frage {frageNummer}/{fragen.Count}:");
+                    Console.ResetColor();
+                    Console.WriteLine(frage.FrageText);
+
+                    if (frage.Typ == "MultipleChoice")
+                    {
+                        for (int i = 0; i < frage.Antworten.Count; i++)
+                        {
+                            Console.WriteLine($"   {i + 1}) {frage.Antworten[i]}");
+                        }
+                        
+                        Console.Write("\n➡️  Deine Antwort (z.B. 1 oder 1,2): ");
+                        var eingabe = Console.ReadLine() ?? string.Empty;
+
+                        var antworten = eingabe.Split(',', StringSplitOptions.RemoveEmptyEntries)
+                            .Select(s => int.TryParse(s.Trim(), out int val) ? val - 1 : -1)
+                            .Where(i => i >= 0)
+                            .ToList();
+
+                        if (PruefeMultipleChoice(frage, antworten))
+                        {
+                            Console.ForegroundColor = ConsoleColor.Green;
+                            Console.WriteLine("✅ Richtig!");
+                            Console.ResetColor();
+                            punktzahl++;
+                        }
+                        else
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine("❌ Falsch!");
+                            Console.ResetColor();
+                            Console.WriteLine("✔️  Richtige Antwort(en): " + 
+                                string.Join(", ", frage.RichtigeAntworten.Select(i => (i + 1).ToString())));
+                        }
+                    }
+                    else if (frage.Typ == "Offen")
+                    {
+                        Console.Write("\n✏️  Deine Antwort: ");
+                        var userAntwort = Console.ReadLine() ?? string.Empty;
+                        double score = PruefeOffeneFrage(userAntwort, frage.RichtigeAntwort);
+
+                        if (score >= 0.8)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Green;
+                            Console.WriteLine("✅ Vollständig korrekt!");
+                            Console.ResetColor();
+                            punktzahl++;
+                        }
+                        else if (score >= 0.5)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Yellow;
+                            Console.WriteLine("🟡 Teilweise korrekt (0.5 Punkte).");
+                            Console.ResetColor();
+                            punktzahl += 0.5;
+                        }
+                        else
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine("❌ Leider falsch.");
+                            Console.ResetColor();
+                            Console.WriteLine("💡 Erwartete Schlüsselbegriffe: " + frage.RichtigeAntwort);
+                        }
+                    }
+
+                    frageNummer++;
+                }
+
+                benutzer.Punktestand = punktzahl;
+                Console.WriteLine("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.WriteLine($"🏁 Quiz beendet! {benutzer.Name}, du hast {punktzahl:0.0} von {fragen.Count} Punkten erreicht.");
+                Console.ResetColor();
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"❌ Fehler beim Laden der Fragen: {ex.Message}");
+                Console.ResetColor();
+            }
+        }
+
+        static bool PruefeMultipleChoice(Frage frage, List<int> benutzerAntworten)
+        {
+            if (benutzerAntworten == null || benutzerAntworten.Count == 0) 
+                return false;
+            
+            if (benutzerAntworten.All(a => frage.RichtigeAntworten.Contains(a)) && 
+                benutzerAntworten.Count == frage.RichtigeAntworten.Count)
+                return true;
+            
+            return false;
+        }
+
+        static double PruefeOffeneFrage(string benutzerAntwort, string richtigeAntwort)
+        {
+            benutzerAntwort = (benutzerAntwort ?? "").ToLower().Trim();
+            richtigeAntwort = (richtigeAntwort ?? "").ToLower().Trim();
+
+            var schluesselwoerter = richtigeAntwort.Split(' ')
+                .Select(w => w.Trim(new[] { ',', '.', ';', ':', '!', '?', '(', ')' }))
+                .Where(w => w.Length > 3)
+                .Distinct()
+                .ToList();
+
+            if (schluesselwoerter.Count == 0) 
+                return 0;
+            
+            int treffer = schluesselwoerter.Count(w => benutzerAntwort.Contains(w));
+            return (double)treffer / schluesselwoerter.Count;
+        }
+
+        static List<Benutzer> LadeScores()
+        {
+            try
+            {
+                if (!File.Exists(ScoresFile)) 
+                    return new List<Benutzer>();
+                
+                return JsonConvert.DeserializeObject<List<Benutzer>>(File.ReadAllText(ScoresFile)) 
+                    ?? new List<Benutzer>();
+            }
+            catch
+            {
+                return new List<Benutzer>();
+            }
+        }
+
+        static void SpeichereScores(List<Benutzer> scores)
+        {
+            try
+            {
+                File.WriteAllText(ScoresFile, JsonConvert.SerializeObject(scores, Formatting.Indented));
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"❌ Fehler beim Speichern: {ex.Message}");
+                Console.ResetColor();
+            }
+        }
+
+        static void ZeigeHighscores(List<Benutzer> scores)
+        {
+            Console.WriteLine("\n🏆 ═══════════════════════════════════════");
+            Console.WriteLine("       Highscores - Top 10");
+            Console.WriteLine("═══════════════════════════════════════");
+            
+            var top = scores.OrderByDescending(s => s.Punktestand)
+                           .ThenBy(s => s.Name)
+                           .Take(10)
+                           .ToList();
+            
+            if (top.Count == 0)
+            {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine("ℹ️  Keine Scores vorhanden.");
+                Console.ResetColor();
+                return;
+            }
+
+            int rang = 1;
+            foreach (var s in top)
+            {
+                string medal = rang == 1 ? "🥇" : rang == 2 ? "🥈" : rang == 3 ? "🥉" : "  ";
+                Console.WriteLine($"{medal} {rang}. {s.Name} - {s.Punktestand:0.0} Punkte ({s.Datum})");
+                rang++;
+            }
+        }
+
+        static void PauseUndLoesche()
+        {
+            Console.WriteLine("\n⏸️  Drücke Enter zum Zurückkehren zum Menü...");
+            Console.ReadLine();
+            Console.Clear();
+            ZeigeHeader();
+        }
+
+        static bool LasseTimerLaufen(int sekunden, string phase)
+        {
+            DateTime startZeit = DateTime.Now;
+            DateTime endZeit = startZeit.AddSeconds(sekunden);
+
+            while (DateTime.Now < endZeit)
+            {
+                TimeSpan verbleibend = endZeit - DateTime.Now;
+                
+                // Zeige verbleibende Zeit
+                Console.Write($"\r⏱️  [{phase}] Verbleibende Zeit: {verbleibend.Minutes:00}:{verbleibend.Seconds:00}  ");
+                
+                // Prüfe, ob Benutzer abbrechen möchte
+                if (Console.KeyAvailable)
+                {
+                    var taste = Console.ReadKey(intercept: true).Key;
+                    if (taste == ConsoleKey.Escape || taste == ConsoleKey.Q)
+                    {
+                        Console.WriteLine("\n\n⛔ Timer abgebrochen.");
+                        return false;
+                    }
+                }
+                
+                Thread.Sleep(1000); // 1 Sekunde warten
+            }
+            
+            Console.WriteLine("\r⏱️  [" + phase + "] Verbleibende Zeit: 00:00  ");
+            return true;
+        }
+
+        static void SpieleSignalTon()
+        {
+            try
+            {
+                // Spiele einen Signalton (funktioniert auf Windows)
+                if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+                {
+                    Console.Beep(800, 200);  // Ton 1
+                    Thread.Sleep(100);
+                    Console.Beep(1000, 200); // Ton 2
+                    Thread.Sleep(100);
+                    Console.Beep(1200, 300); // Ton 3
+                }
+                else
+                {
+                    Console.Write("\a"); // Terminal-Bell für andere Systeme
+                }
+            }
+            catch
+            {
+                // Falls Beep nicht unterstützt wird, zeige nur visuelles Signal
+                Console.Write("\a"); // Terminal-Bell
+            }
+        }
+    }
+}

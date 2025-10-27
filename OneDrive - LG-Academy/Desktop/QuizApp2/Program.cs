@@ -11,7 +11,7 @@ namespace QuizApp2
     // Hier startet die Anwendung und verwaltet das Hauptmenü
     public class Program
     {
-    // Hauptmethode - hier startet das Programm
+        // Hauptmethode - hier startet das Programm
         static void Main(string[] args)
         {
             // UTF-8 Encoding aktivieren, damit deutsche Umlaute korrekt angezeigt werden
@@ -61,7 +61,7 @@ namespace QuizApp2
 
         }
 
-    // Zeigt den Willkommensbildschirm mit dem Titel der App
+        // Zeigt den Willkommensbildschirm mit dem Titel der App
         static void ShowHeader()
         {
             Console.Clear(); // Bildschirm löschen
@@ -71,7 +71,7 @@ namespace QuizApp2
             Console.WriteLine("=========================================");
         }
 
-    // Zeigt das Hauptmenü mit allen verfügbaren Optionen
+        // Zeigt das Hauptmenü mit allen verfügbaren Optionen
         static void ZeigeHauptmenue()
         {
             Console.WriteLine("\n📋 Hauptmenü:");
@@ -83,8 +83,8 @@ namespace QuizApp2
             Console.Write("➡️  Deine Auswahl: ");
         }
 
-    // Startet das Quiz im Lernmodus mit Pomodoro-Technik
-    // Pomodoro: 4 Runden à 25 Min Fokus mit 5 Min Pause, dann 20 Min lange Pause
+        // Startet das Quiz im Lernmodus mit Pomodoro-Technik
+        // Pomodoro: 4 Runden à 25 Min Fokus mit 5 Min Pause, dann 20 Min lange Pause
         static void StarteQuizLernmodus()
         {
             Console.Clear();
@@ -170,25 +170,13 @@ namespace QuizApp2
                     else
                     {
                         // Offene Frage: Benutzer gibt Freitext-Antwort ein
-                        // Für alle offenen Fragen inkl. Frage 3: eine Zeile, Antworten durch Komma getrennt
                         Console.Write("Antwort: ");
                         string userAntwort = Console.ReadLine() ?? "";
                         
-                        // Bewerte die Antwort: Akzeptiere auch kurze/ähnliche Antworten
-                        string richtigeAntwort = frage.RichtigeAntwort.ToLower();
-                        string userAntwortLower = userAntwort.ToLower().Trim();
+                        // Bewerte die Antwort mit der Helper-Funktion
+                        double score = BewerteOffeneFrage(userAntwort, frage.RichtigeAntwort);
                         
-                        // Teile die richtige Antwort in einzelne Schlüsselwörter
-                        string[] schluesselwoerter = richtigeAntwort.Split(new[] {' ', ';', ','}, StringSplitOptions.RemoveEmptyEntries);
-                        
-                        // Prüfe ob mindestens ein Schlüsselwort in der Benutzerantwort vorkommt
-                        bool enthaltSchluesselwort = schluesselwoerter.Any(s => 
-                            s.Length > 3 && userAntwortLower.Contains(s.Trim()));
-                        
-                        // Berechne Ähnlichkeitsscore als Fallback
-                        double score = enthaltSchluesselwort ? 1.0 : EvaluateOpenQuestion(userAntwort, frage.RichtigeAntwort);
-                        
-                        // Bewerte basierend auf dem Score
+                        // Zeige Ergebnis basierend auf Score
                         if (score >= 0.8)
                         {
                             Console.WriteLine("✅ Richtig!"); 
@@ -254,8 +242,8 @@ namespace QuizApp2
             Console.WriteLine($"\nQuiz beendet! Du hast {punkte} Punkte.");
         }
 
-    // Startet den Prüfungsmodus: 1,5 Stunden Zeit ohne Pausen
-    // Alle Fragen werden durchgegangen bis Zeit abläuft oder alle beantwortet sind
+        // Startet den Prüfungsmodus: 1,5 Stunden Zeit ohne Pausen
+        // Alle Fragen werden durchgegangen bis Zeit abläuft oder alle beantwortet sind
         static void StartePruefungsmodus()
         {
             Console.Clear();
@@ -297,14 +285,17 @@ namespace QuizApp2
                 {
                     Console.Write("Antwort: ");
                     var userAntwort = Console.ReadLine() ?? "";
-                    double score = EvaluateOpenQuestion(userAntwort, frage.RichtigeAntwort);
+                    double score = BewerteOffeneFrage(userAntwort, frage.RichtigeAntwort);
+                    
                     if (score >= 0.8)
                     {
-                        Console.WriteLine("✅ Richtig!"); punkte++;
+                        Console.WriteLine("✅ Richtig!"); 
+                        punkte++;
                     }
                     else if (score >= 0.5)
                     {
-                        Console.WriteLine("➖ Teilweise richtig!"); punkte += 0.5;
+                        Console.WriteLine("➖ Teilweise richtig!"); 
+                        punkte += 0.5;
                     }
                     else
                     {
@@ -319,8 +310,27 @@ namespace QuizApp2
             Console.WriteLine($"\nPrüfung beendet! Du hast {punkte} Punkte in {gebraucht.Minutes} Minuten.");
         }
 
-    // Berechnet wie ähnlich die Benutzerantwort zur richtigen Antwort ist
-    // Gibt einen Wert zwischen 0.0 (gar nicht ähnlich) und 1.0 (identisch) zurück
+        // Helper-Funktion: Bewertet eine offene Frage mit Schlüsselwort-Matching
+        // Akzeptiert auch kurze/ähnliche Antworten für mehr Flexibilität
+        static double BewerteOffeneFrage(string userAntwort, string richtigeAntwort)
+        {
+            // Konvertiere beide Antworten zu Kleinbuchstaben
+            string richtigeAntwortLower = richtigeAntwort.ToLower();
+            string userAntwortLower = userAntwort.ToLower().Trim();
+            
+            // Teile die richtige Antwort in einzelne Schlüsselwörter
+            string[] schluesselwoerter = richtigeAntwortLower.Split(new[] {' ', ';', ','}, StringSplitOptions.RemoveEmptyEntries);
+            
+            // Prüfe ob mindestens ein Schlüsselwort in der Benutzerantwort vorkommt
+            bool enthaltSchluesselwort = schluesselwoerter.Any(s => 
+                s.Length > 3 && userAntwortLower.Contains(s.Trim()));
+            
+            // Wenn Schlüsselwort gefunden, gib 1.0 zurück, sonst berechne Ähnlichkeitsscore
+            return enthaltSchluesselwort ? 1.0 : EvaluateOpenQuestion(userAntwort, richtigeAntwort);
+        }
+
+        // Berechnet wie ähnlich die Benutzerantwort zur richtigen Antwort ist
+        // Gibt einen Wert zwischen 0.0 (gar nicht ähnlich) und 1.0 (identisch) zurück
         public static double AehnlichkeitsScore(string benutzerAntwort, string richtigeAntwort)
         {
             // Konvertiere beide Antworten zu Kleinbuchstaben und entferne Leerzeichen
@@ -344,24 +354,8 @@ namespace QuizApp2
             return (double)treffer / schluesselwoerter.Count;
         }
 
-    // Bewertet eine Multiple-Choice Antwort
-    // Gibt 1.0 zurück wenn alles korrekt ist, sonst 0.0
-        public static double EvaluateMultipleChoice(Frage frage, List<int> benutzerAntworten)
-        {
-            // Wenn keine Antworten gegeben wurden
-            if (benutzerAntworten == null || benutzerAntworten.Count == 0)
-                return 0.0;
-
-            // Prüfe ob alle gewählten Antworten richtig sind UND keine fehlt
-            if (benutzerAntworten.All(a => frage.RichtigeAntworten.Contains(a)) && 
-                benutzerAntworten.Count == frage.RichtigeAntworten.Count)
-                return 1.0;
-
-            return 0.0;
-        }
-
-    // Bewertet eine offene Frage basierend auf Ähnlichkeit
-    // Gibt 1.0 (richtig), 0.5 (teilweise) oder 0.0 (falsch) zurück
+        // Bewertet eine offene Frage basierend auf Ähnlichkeit
+        // Gibt 1.0 (richtig), 0.5 (teilweise) oder 0.0 (falsch) zurück
         public static double EvaluateOpenQuestion(string benutzerAntwort, string richtigeAntwort)
         {
             // Berechne Ähnlichkeitsscore
@@ -373,7 +367,7 @@ namespace QuizApp2
             return 0.0;                     // Unter 50% = falsch
         }
 
-    // Wartet auf Enter-Taste und zeigt dann wieder das Hauptmenü
+        // Wartet auf Enter-Taste und zeigt dann wieder das Hauptmenü
         static void PauseAndClear()
         {
             Console.WriteLine("\nDrücke Enter zum Zurückkehren zum Menü...");
@@ -382,20 +376,34 @@ namespace QuizApp2
             ShowHeader();
         }
 
-   
+        // Spielt einen "Clopotel"-Ton (3x hohe Frequenz)
+        // Funktioniert auf Windows - auf anderen Systemen wird ein Fallback verwendet
         static void SpieleSignalTon()
         {
             try
             {
-                for (int i = 0; i < 3; i++)
+                // Prüfe ob wir auf Windows sind
+                if (OperatingSystem.IsWindows())
                 {
-                    Console.Beep(2000, 180); 
-                    Thread.Sleep(80); // kurze Pause zwischen den Tönen
+                    for (int i = 0; i < 3; i++)
+                    {
+                        Console.Beep(2000, 180); 
+                        Thread.Sleep(80); // kurze Pause zwischen den Tönen
+                    }
+                }
+                else
+                {
+                    // Fallback für andere Betriebssysteme
+                    for (int i = 0; i < 3; i++)
+                    {
+                        Console.Write("\a");
+                        Thread.Sleep(80);
+                    }
                 }
             }
             catch
             {
-                // Fallback: System-Beep mehrmals
+                // Fallback bei Fehlern: System-Beep
                 for (int i = 0; i < 3; i++)
                 {
                     Console.Write("\a");
@@ -405,8 +413,6 @@ namespace QuizApp2
         }
     }
 }
-
-
 
 
 

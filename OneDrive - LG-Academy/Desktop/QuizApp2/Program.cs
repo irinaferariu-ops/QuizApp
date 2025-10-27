@@ -217,7 +217,9 @@ namespace QuizApp2
                             Thread.Sleep(1000); // Warte 1 Sekunde
                         }
                     }
-                    Console.WriteLine("\nWeiter mit Fokus!");
+                    Console.WriteLine("\n✅ Pause vorbei!");
+                    SpieleSignalTon(); // Signalton am Ende der Pause
+                    Console.WriteLine("Weiter mit Fokus!");
                 }
                 else
                 {
@@ -234,7 +236,9 @@ namespace QuizApp2
                             Thread.Sleep(1000); // Warte 1 Sekunde
                         }
                     }
-                    Console.WriteLine("\nWeiter mit Fokus!");
+                    Console.WriteLine("\n✅ Pause vorbei!");
+                    SpieleSignalTon(); // Signalton am Ende der langen Pause
+                    Console.WriteLine("Weiter mit Fokus!");
                 }
             }
             
